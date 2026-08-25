@@ -1,0 +1,450 @@
+1)#include<stdio.h>
+int main(){
+    int i,n,*p;
+    scanf("%d",&n);
+    int arr[n];
+    p=arr;
+    for(i=0;i<n;i++){
+        scanf("%d",(p+i));
+    }
+    for(i=0;i<n;i++)
+    printf("%d ",*(p+i));
+    for(i=0;i<n;i++)
+    *(p+i)=*(p+i)+10;
+    printf("\n");
+    for(i=0;i<n;i++)
+    printf("%d ",*(p+i));
+}
+Output:
+5
+1
+2
+3
+4
+5
+1 2 3 4 5 
+11 12 13 14 15 
+
+2)#include<stdio.h>
+int main(){
+char str[100],*ptr;
+int i,len=0;
+ptr=str;
+scanf("%s",str);
+for(i=0;*(ptr+i)!='\0';i++)
+len++;
+printf("%d",len);
+}
+Output:
+sebas
+5
+
+3)#include<stdio.h>
+void sumprod(int *a,int *b){
+    printf("Sum:%d\n",*a+*b);
+    printf("Product:%d",*a * *b);
+}
+int main(){
+    int x,y;
+    scanf("%d",&x);
+    scanf("%d",&y);
+    sumprod(&x,&y);
+}
+
+Output:
+2
+3
+Sum:5
+Product:6
+
+4)#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Array
+{
+    int num;
+    char str[20];
+};
+
+int main()
+{
+    int n,i;
+
+    scanf("%d",&n);
+
+    struct Array *ptr;
+
+    ptr=(struct Array*)malloc(n*sizeof(struct Array));
+
+    for(i=0;i<n;i++)
+    {
+        printf("Enter num:");
+        scanf("%d",&(ptr+i)->num);
+
+        printf("Enter str:");
+        scanf("%s",(ptr+i)->str);
+    }
+
+    printf("\nBefore modification:\n");
+
+    for(i=0;i<n;i++)
+    {
+        printf("%d ",(ptr+i)->num);
+        printf("%s\n",(ptr+i)->str);
+    }
+
+    if(n >=5)
+    {
+        (ptr+3)->num = 5;
+        strcpy((ptr+4)->str,"Hello");
+    }
+
+    printf("\nAfter modification:\n");
+
+    for(i=0;i<n;i++)
+    {
+        printf("%d ",(ptr+i)->num);
+        printf("%s\n",(ptr+i)->str);
+    }
+
+    free(ptr);
+
+    return 0;
+}
+
+Output:
+5
+Enter num:10
+Enter str:sebas
+Enter num:20
+Enter str:tina
+Enter num:30
+Enter str:mary
+Enter num:40
+Enter str:eliz
+Enter num:50
+Enter str:fluffy
+
+Before modification:
+10 sebas
+20 tina
+30 mary
+40 eliz
+50 fluffy
+
+After modification:
+10 sebas
+20 tina
+30 mary
+5 eliz
+50 Hello
+
+5)#include<stdio.h>
+int math(int a, int b){
+    
+    return a+b;
+}
+int math2(int a, int b){
+    return a*b;
+}
+int main(){
+int (*f1)(int , int);
+int (*f2)(int , int);
+f1=math;
+f2=math2;
+printf("Sum:%d\n",(*f1)(2,3));
+printf("Multiply:%d",(*f2)(2,3));
+}
+Output:
+Sum:5
+Multiply:6
+
+6)#include<stdio.h>
+
+int main()
+{
+    int num, *ptr, **pptr;
+
+    ptr = &num;
+    pptr = &ptr;
+
+    scanf("%d",&num);
+
+    printf("Value of num: %d\n",num);
+    printf("Value using ptr: %d\n",*ptr);
+    printf("Value using pptr: %d\n",**pptr);
+
+    printf("Address of num: %p\n",(void*)&num);
+    printf("Address stored in ptr: %p\n",(void*)ptr);
+
+    printf("Address of ptr: %p\n",(void*)&ptr);
+    printf("Address stored in pptr: %p\n",(void*)pptr);
+
+    return 0;
+}
+
+Output:
+2
+Value of num: 2
+Value using ptr: 2
+Value using pptr: 2
+Address of num: 0x7ffd5c9552f4
+Address stored in ptr: 0x7ffd5c9552f4
+Address of ptr: 0x7ffd5c9552e8
+Address stored in pptr: 0x7ffd5c9552e8
+
+7)
+#include<stdio.h>
+
+int smallest(float a[], int k, int n)
+{
+    int i, pos = k;
+    float small = a[k];
+
+    for(i = k + 1; i < n; i++)
+    {
+        if(a[i] < small)
+        {
+            small = a[i];
+            pos = i;
+        }
+    }
+
+    return pos;
+}
+
+void sel_sort(float a[], int n)
+{
+    int  k, pos;
+    float temp;
+
+    for(k = 0; k < n - 1; k++)
+    {
+        pos = smallest(a, k, n);
+
+        temp = a[k];
+        a[k] = a[pos];
+        a[pos] = temp;
+    }
+}
+
+int main()
+{
+    int i, n;
+    scanf("%d",&n);
+
+    float a[n];
+
+    for(i = 0; i < n; i++)
+        scanf("%f",&a[i]);
+
+    sel_sort(a,n);
+
+    printf("Sorted array:\n");
+
+    for(i = 0; i < n; i++)
+        printf("%.2f ",a[i]);
+
+    return 0;
+}
+
+Output:
+5
+1.1 3.4 7.5 2.7 0.5
+Sorted array:
+0.50 1.10 2.70 3.40 7.50 
+
+8)
+#include<stdio.h>
+#include<string.h>
+
+struct Student
+{
+    int id;
+    char name[20];
+    char grade;
+};
+
+void sort(struct Student a[], int n, int choice)
+{
+    int i,j;
+    struct Student temp;
+
+    for(i=0;i<n-1;i++)
+    {
+        for(j=i+1;j<n;j++)
+        {
+            if((choice==1 && a[i].id>a[j].id) ||
+               (choice==2 && strcmp(a[i].name,a[j].name)>0) ||
+               (choice==3 && a[i].grade>a[j].grade))
+            {
+                temp=a[i];
+                a[i]=a[j];
+                a[j]=temp;
+            }
+        }
+    }
+}
+
+int main()
+{
+    int i,n,choice;
+
+    scanf("%d",&n);
+
+    struct Student a[n];
+
+    for(i=0;i<n;i++)
+        scanf("%d %s %c",&a[i].id,a[i].name,&a[i].grade);
+
+    printf("Select sorting criteria:\n");
+    printf("1-ID  2-Name  3-Grade\n");
+    scanf("%d",&choice);
+
+    sort(a,n,choice);
+
+    for(i=0;i<n;i++)
+        printf("%d %s %c\n",a[i].id,a[i].name,a[i].grade);
+
+    return 0;
+}
+
+Output:
+5
+101 sebas A
+104 tina C
+102 elize D
+100 mary B
+103 faus E
+Select sorting criteria:
+1-ID  2-Name  3-Grade
+1
+100 mary B
+101 sebas A
+102 eliz D
+103 faus E
+104 tina C
+
+9)#include<stdio.h>
+
+void radix(int a[], int n)
+{
+    int bucket[10][20];
+    int bucket_count[10];
+    int i,j,k,digit,div=1,max=a[0];
+
+    for(i=1;i<n;i++)
+        if(a[i]>max)
+            max=a[i];
+
+    while(max/div>0)
+    {
+        for(i=0;i<10;i++)
+            bucket_count[i]=0;
+
+        for(i=0;i<n;i++)
+        {
+            digit=(a[i]/div)%10;
+            bucket[digit][bucket_count[digit]]=a[i];
+            bucket_count[digit]++;
+        }
+
+        k=0;
+
+        for(i=0;i<10;i++)
+        {
+            for(j=0;j<bucket_count[i];j++)
+            {
+                a[k]=bucket[i][j];
+                k++;
+            }
+        }
+
+        div=div*10;
+    }
+}
+
+int main()
+{
+    int a[20],pos[20],neg[20];
+    int n,i,p=0,k=0,j=0;
+
+    scanf("%d",&n);
+
+    for(i=0;i<n;i++)
+        scanf("%d",&a[i]);
+
+
+
+    for(i=0;i<n;i++)
+    {
+        if(a[i]<0)
+            neg[k++]=-a[i];
+        else
+            pos[p++]=a[i];
+    }
+
+
+    radix(neg,k);
+    radix(pos,p);
+
+
+    for(i=k-1;i>=0;i--)
+        a[j++]=-neg[i];
+
+
+    for(i=0;i<p;i++)
+        a[j++]=pos[i];
+
+    printf("Sorted array:\n");
+
+    for(i=0;i<n;i++)
+        printf("%d ",a[i]);
+
+    return 0;
+}
+
+Output:
+8
+-345 123 -678 456 -234 789 321 -567
+Sorted array:
+-678 -567 -345 -234 123 321 456 789 
+
+10)
+#include<stdio.h>
+
+int main()
+{
+    int a[20], b[20], n, i;
+    int *p, *q;
+
+    scanf("%d",&n);
+
+    for(i=0;i<n;i++)
+        scanf("%d",&a[i]);
+
+    p=a;
+    q=b;
+
+    for(i=0;i<n;i++)
+    {
+        *(q+i)=*(p+i);
+    }
+
+    printf("Copied array:\n");
+
+    for(i=0;i<n;i++)
+        printf("%d ",*(q+i));
+
+    return 0;
+}
+
+Output:
+5
+1 2 3 4 5
+Copied array:
+1 2 3 4 5 
+
+
+

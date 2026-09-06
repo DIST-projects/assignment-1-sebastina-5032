@@ -207,43 +207,60 @@ After Forward: YouTube
 
 4)
 #include <stdio.h>
-#define MAX 20
-
+#define MAX 100
+int stack[MAX], top = -1;
+int temp[MAX], ttop = -1;
+void push(int stack[], int *top, int value)
+{
+ stack[++(*top)] = value;
+}
+int pop(int stack[], int *top)
+{
+ return stack[(*top)--];
+}
+void sortStack()
+{
+ while (top != -1)
+ {
+ int x = pop(stack, &top);
+ while (ttop != -1 && temp[ttop] > x)
+ {
+ push(stack, &top, pop(temp, &ttop));
+ }
+push(temp, &ttop, x);
+ }
+ while (ttop != -1)
+ {
+ push(stack, &top, pop(temp, &ttop));
+ }
+}
+void display()
+{
+ printf("Sorted Stack: ");
+ for (int i = top; i >= 0; i--)
+ {
+ printf("%d ", stack[i]);
+ }
+}
 int main()
 {
-    int stack[MAX], temp[MAX];
-    int top = -1, ttop = -1;
-    int n, i, x;
-
-    printf("Enter number of elements: ");
-    scanf("%d", &n);
-
-    printf("Enter stack elements:\n");
-    for (i = 0; i < n; i++)
-        scanf("%d", &stack[++top]);
-
-    while (top != -1)
-    {
-        x = stack[top--];
-
-        while (ttop != -1 && temp[ttop] > x)
-            stack[++top] = temp[ttop--];
-
-        temp[++ttop] = x;
-    }
-
-    printf("Sorted stack (top to bottom): ");
-    while (ttop != -1)
-        printf("%d ", temp[ttop--]);
-
-    return 0;
+ int n, value;
+ printf("Enter number of elements: ");
+ scanf("%d", &n);
+ printf("Enter stack elements:\n");
+for (int i = 0; i < n; i++)
+ {
+ scanf("%d", &value);
+ push(stack, &top, value);
+ }
+ sortStack();
+ display();
+ return 0;
 }
 Output:
-Enter number of elements: 6
-Enter stack elements:
-34 12 56 8 25 19
-Sorted stack (top to bottom): 8 12 19 25 34 56
-
+Enter number of elements:5
+Enter stack elements:31 21 45 77 22
+Sorted Stack: 21 22 31 45 77
 5)
 #include <stdio.h>
 #define MAX 50

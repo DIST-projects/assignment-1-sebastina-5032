@@ -1,0 +1,577 @@
+1)#include <stdio.h>
+#define MAX 20
+
+int q1[MAX], q2[MAX];
+int f1 = 0, r1 = 0, f2 = 0, r2 = 0;
+
+void push(int x)
+{
+    while (f1 < r1)
+        q2[r2++] = q1[f1++];
+
+    q1[r1++] = x;
+
+    while (f2 < r2)
+        q1[r1++] = q2[f2++];
+
+    f1 = 0;
+    r2 = 0;
+    f2 = 0;
+}
+
+int pop()
+{
+    if (f1 == r1)
+        return -1;
+
+    return q1[f1++];
+}
+
+void display()
+{
+    int i;
+
+    for (i = f1; i < r1; i++)
+        printf("%d ", q1[i]);
+}
+
+int main()
+{
+    int n, x, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter stack elements:\n");
+    for (i = 0; i < n; i++)
+    {
+        scanf("%d", &x);
+        push(x);
+    }
+
+    printf("Stack elements: ");
+    display();
+
+    printf("\nPopped element: %d", pop());
+
+    printf("\nStack after pop: ");
+    display();
+
+    return 0;
+}
+Output:
+Enter number of elements: 3
+Enter stack elements:
+10 20 30
+Stack elements: 30 20 10
+Popped element: 30
+Stack after pop: 20 10
+
+2)
+#include <stdio.h>
+#define MAX 20
+
+int s1[MAX], s2[MAX];
+int top1 = -1, top2 = -1;
+
+void enqueue(int x)
+{
+    s1[++top1] = x;
+}
+
+int dequeue()
+{
+    int x;
+
+    if (top1 == -1 && top2 == -1)
+        return -1;
+
+    if (top2 == -1)
+    {
+        while (top1 != -1)
+            s2[++top2] = s1[top1--];
+    }
+
+    x = s2[top2--];
+    return x;
+}
+
+void display()
+{
+    int i;
+
+    if (top2 != -1)
+        for (i = top2; i >= 0; i--)
+            printf("%d ", s2[i]);
+
+    for (i = 0; i <= top1; i++)
+        printf("%d ", s1[i]);
+}
+
+int main()
+{
+    int n, x, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter queue elements:\n");
+    for (i = 0; i < n; i++)
+    {
+        scanf("%d", &x);
+        enqueue(x);
+    }
+
+    printf("Queue elements: ");
+    display();
+
+    printf("\nDeleted element: %d", dequeue());
+
+    printf("\nQueue after deletion: ");
+    display();
+
+    return 0;
+}
+Output:
+Enter number of elements: 3
+Enter queue elements:
+10 20 30
+Queue elements: 10 20 30
+Deleted element: 10
+Queue after deletion: 20 30
+
+3)
+#include <stdio.h>
+#include <string.h>
+#define MAX 20
+
+char back[MAX][50], forward[MAX][50];
+int topBack = -1, topForward = -1;
+char current[50] = "Home";
+
+void visit(char page[])
+{
+    strcpy(back[++topBack], current);
+    strcpy(current, page);
+    topForward = -1;
+}
+
+void goBack()
+{
+    if (topBack == -1)
+    {
+        printf("\nNo previous page.");
+        return;
+    }
+
+    strcpy(forward[++topForward], current);
+    strcpy(current, back[topBack--]);
+}
+
+void goForward()
+{
+    if (topForward == -1)
+    {
+        printf("\nNo forward page.");
+        return;
+    }
+
+    strcpy(back[++topBack], current);
+    strcpy(current, forward[topForward--]);
+}
+
+int main()
+{
+    visit("Google");
+    visit("YouTube");
+    visit("Wikipedia");
+
+    printf("Current page: %s", current);
+
+    goBack();
+    printf("\nAfter Back: %s", current);
+
+    goBack();
+    printf("\nAfter Back: %s", current);
+
+    goForward();
+    printf("\nAfter Forward: %s", current);
+
+    return 0;
+}
+Output:
+Current page: Wikipedia
+After Back: YouTube
+After Back: Google
+After Forward: YouTube
+
+4)
+#include <stdio.h>
+#define MAX 20
+
+int main()
+{
+    int stack[MAX], temp[MAX];
+    int top = -1, ttop = -1;
+    int n, i, x;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter stack elements:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &stack[++top]);
+
+    while (top != -1)
+    {
+        x = stack[top--];
+
+        while (ttop != -1 && temp[ttop] > x)
+            stack[++top] = temp[ttop--];
+
+        temp[++ttop] = x;
+    }
+
+    printf("Sorted stack (top to bottom): ");
+    while (ttop != -1)
+        printf("%d ", temp[ttop--]);
+
+    return 0;
+}
+Output:
+Enter number of elements: 6
+Enter stack elements:
+34 12 56 8 25 19
+Sorted stack (top to bottom): 8 12 19 25 34 56
+
+5)
+#include <stdio.h>
+#define MAX 50
+
+int main()
+{
+    int price[MAX], span[MAX], stack[MAX];
+    int top = -1, n, i;
+
+    printf("Enter number of days: ");
+    scanf("%d", &n);
+
+    printf("Enter stock prices:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &price[i]);
+
+    for (i = 0; i < n; i++)
+    {
+        while (top != -1 && price[stack[top]] <= price[i])
+            top--;
+
+        if (top == -1)
+            span[i] = i + 1;
+        else
+            span[i] = i - stack[top];
+
+        stack[++top] = i;
+    }
+
+    printf("Stock prices: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", price[i]);
+
+    printf("\nStock spans: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", span[i]);
+
+    return 0;
+}
+Output:
+Enter number of days: 7
+Enter stock prices:
+100 80 60 70 60 75 85
+Stock prices: 100 80 60 70 60 75 85
+Stock spans: 1 1 1 2 1 4 6
+
+6)#include <stdio.h>
+#define MAX 50
+
+int main()
+{
+    int a[MAX], freq[MAX], ans[MAX], stack[MAX];
+    int n, i, j, top = -1;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter elements:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    for (i = 0; i < n; i++)
+    {
+        freq[i] = 0;
+
+        for (j = 0; j < n; j++)
+            if (a[i] == a[j])
+                freq[i]++;
+    }
+
+    for (i = n - 1; i >= 0; i--)
+    {
+        while (top != -1 && freq[stack[top]] <= freq[i])
+            top--;
+
+        if (top == -1)
+            ans[i] = -1;
+        else
+            ans[i] = a[stack[top]];
+
+        stack[++top] = i;
+    }
+
+    printf("Answer: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", ans[i]);
+
+    return 0;
+}
+Output:
+Enter number of elements: 6
+Enter elements:
+2 1 1 3 2 1
+Answer: 1 -1 -1 2 1 -1
+
+7)
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char pattern[20];
+    int stack[20], top = -1;
+    int i, num = 1, len;
+
+    printf("Enter pattern: ");
+    scanf("%s", pattern);
+
+    len = strlen(pattern);
+
+    printf("Minimum number: ");
+
+    for (i = 0; i <= len; i++)
+    {
+        stack[++top] = num++;
+
+        if (i == len || pattern[i] == 'I')
+        {
+            while (top != -1)
+                printf("%d", stack[top--]);
+        }
+    }
+
+    return 0;
+}
+Output:
+Enter pattern: DIDI
+Minimum number: 21435
+
+8)
+#include <stdio.h>
+#define MAX 50
+
+int queue[MAX];
+int front = 0, rear = -1;
+
+void enqueue(int x)
+{
+    queue[++rear] = x;
+}
+
+int dequeue()
+{
+    return queue[front++];
+}
+
+int main()
+{
+    int arr[MAX], n, i, j, temp;
+    int num1 = 0, num2 = 0;
+    int turn = 0;
+
+    printf("Enter number of digits: ");
+    scanf("%d", &n);
+
+    printf("Enter the digits:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    for (i = 0; i < n - 1; i++)
+        for (j = i + 1; j < n; j++)
+            if (arr[i] > arr[j])
+            {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+
+    for (i = 0; i < n; i++)
+        enqueue(arr[i]);
+
+    while (front <= rear)
+    {
+        int digit = dequeue();
+
+        if (turn == 0)
+        {
+            num1 = num1 * 10 + digit;
+            turn = 1;
+        }
+        else
+        {
+            num2 = num2 * 10 + digit;
+            turn = 0;
+        }
+    }
+
+    printf("Number 1: %d\n", num1);
+    printf("Number 2: %d\n", num2);
+    printf("Minimum Sum: %d\n", num1 + num2);
+
+    return 0;
+}
+Output:
+Enter number of digits: 6
+Enter the digits:
+6 8 4 5 2 3
+Number 1: 246
+Number 2: 358
+Minimum Sum: 604
+
+9)
+#include <stdio.h>
+#define MAX 50
+
+int main()
+{
+    int a[MAX], q[MAX];
+    int n, k, i;
+    int front = 0, rear = -1;
+
+    printf("Enter array size: ");
+    scanf("%d", &n);
+
+    printf("Enter array elements:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    printf("Enter window size: ");
+    scanf("%d", &k);
+
+    printf("First negative values: ");
+
+    for (i = 0; i < n; i++)
+    {
+        if (a[i] < 0)
+            q[++rear] = i;
+
+        if (i >= k - 1)
+        {
+            while (front <= rear && q[front] < i - k + 1)
+                front++;
+
+            if (front <= rear)
+                printf("%d ", a[q[front]]);
+            else
+                printf("0 ");
+        }
+    }
+
+    return 0;
+}
+Output:
+Enter array size: 5
+Enter array elements:
+-8 2 3 -6 10
+Enter window size: 2
+First negative values: -8 0 -6 -6
+
+
+10)
+#include <stdio.h>
+#define MAX 20
+
+struct Cell
+{
+    int r, c, time;
+};
+
+int main()
+{
+    int a[MAX][MAX], m, n, i, j;
+    int front = 0, rear = -1;
+    int fresh = 0, time = 0;
+    struct Cell q[MAX * MAX];
+
+    printf("Enter rows and columns: ");
+    scanf("%d %d", &m, &n);
+
+    printf("Enter matrix:\n");
+
+    for (i = 0; i < m; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            scanf("%d", &a[i][j]);
+
+            if (a[i][j] == 1)
+                fresh++;
+
+            if (a[i][j] == 2)
+            {
+                q[++rear].r = i;
+                q[rear].c = j;
+                q[rear].time = 0;
+            }
+        }
+    }
+
+    while (front <= rear)
+    {
+        struct Cell cur = q[front++];
+        int dr[4] = {-1, 1, 0, 0};
+        int dc[4] = {0, 0, -1, 1};
+
+        if (cur.time > time)
+            time = cur.time;
+
+        for (i = 0; i < 4; i++)
+        {
+            int nr = cur.r + dr[i];
+            int nc = cur.c + dc[i];
+
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
+                a[nr][nc] == 1)
+            {
+                a[nr][nc] = 2;
+                fresh--;
+
+                q[++rear].r = nr;
+                q[rear].c = nc;
+                q[rear].time = cur.time + 1;
+            }
+        }
+    }
+
+    if (fresh == 0)
+        printf("Minimum time = %d", time);
+    else
+        printf("All oranges cannot be rotten.");
+
+    return 0;
+}
+Output:
+Enter rows and columns: 3 3
+Enter matrix:
+2 1 0
+1 0 2
+0 0 2
+Minimum time = 1
+

@@ -1,0 +1,1219 @@
+1)
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct node {
+    char text[100];
+    struct node *prev, *next;
+};
+
+struct node *head = NULL, *current = NULL;
+
+void insert(char text[]) {
+    struct node *newnode = (struct node *)malloc(sizeof(struct node));
+    strcpy(newnode->text, text);
+    newnode->prev = current;
+    newnode->next = NULL;
+
+    if (current != NULL) {
+        struct node *temp = current->next;
+        while (temp != NULL) {
+            struct node *del = temp;
+            temp = temp->next;
+            free(del);
+        }
+        current->next = newnode;
+    } else {
+        head = newnode;
+    }
+
+    current = newnode;
+}
+
+void undo() {
+    if (current != NULL)
+        current = current->prev;
+}
+
+void redo() {
+    if (current != NULL && current->next != NULL)
+        current = current->next;
+}
+
+void display() {
+    if (current == NULL)
+        printf("Document is empty\n");
+    else
+        printf("Document: %s\n", current->text);
+}
+
+int main() {
+    int ch;
+    char text[100];
+
+    while (1) {
+        printf("\n1.Insert 2.Undo 3.Redo 4.Display 5.Exit\n");
+        scanf("%d", &ch);
+        getchar();
+
+        switch (ch) {
+            case 1:
+                printf("Enter text: ");
+                fgets(text, sizeof(text), stdin);
+                text[strcspn(text, "\n")] = '\0';
+                insert(text);
+                break;
+            case 2: undo(); display(); break;
+            case 3: redo(); display(); break;
+            case 4: display(); break;
+            case 5: return 0;
+        }
+    }
+}
+Output:
+1.Insert 2.Undo 3.Redo 4.Display 5.Exit
+1
+Enter text: Hello
+
+1.Insert 2.Undo 3.Redo 4.Display 5.Exit
+1
+Enter text: Hello World
+
+1.Insert 2.Undo 3.Redo 4.Display 5.Exit
+2
+Document: Hello
+
+1.Insert 2.Undo 3.Redo 4.Display 5.Exit
+3
+Document: Hello World
+
+2)#include <stdio.h>
+
+int main() {
+    int a[50], b[50], c[100], d[100];
+    int n, m, i = 0, j = 0, k = 0, l = 0, x;
+
+    printf("Enter size of L1: ");
+    scanf("%d", &n);
+    printf("Enter sorted elements of L1: ");
+    for (x = 0; x < n; x++)
+        scanf("%d", &a[x]);
+
+    printf("Enter size of L2: ");
+    scanf("%d", &m);
+    printf("Enter sorted elements of L2: ");
+    for (x = 0; x < m; x++)
+        scanf("%d", &b[x]);
+
+    while (i < n && j < m) {
+        if (a[i] == b[j]) {
+            c[k++] = a[i];
+            d[l++] = a[i];
+            i++;
+            j++;
+        } else if (a[i] < b[j]) {
+            d[l++] = a[i++];
+        } else {
+            d[l++] = b[j++];
+        }
+    }
+
+    while (i < n) d[l++] = a[i++];
+    while (j < m) d[l++] = b[j++];
+
+    printf("Intersection: ");
+    for (i = 0; i < k; i++)
+        printf("%d ", c[i]);
+
+    printf("\nUnion: ");
+    for (i = 0; i < l; i++)
+        printf("%d ", d[i]);
+
+    return 0;
+}
+Output:
+Enter size of L1: 4
+Enter sorted elements of L1: 1 3 5 7
+Enter size of L2: 4
+Enter sorted elements of L2: 3 4 5 8
+Intersection: 3 5
+Union: 1 3 4 5 7 8
+
+3)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+void insert(int x) {
+    struct node *n = malloc(sizeof(struct node)), *t = head;
+    n->data = x;
+    n->next = NULL;
+    n->prev = NULL;
+
+    if (head == NULL)
+        head = n;
+    else {
+        while (t->next != NULL)
+            t = t->next;
+        t->next = n;
+        n->prev = t;
+    }
+}
+
+void swap(int x, int y) {
+    struct node *a = head, *b = head, *t;
+
+    while (a && a->data != x) a = a->next;
+    while (b && b->data != y) b = b->next;
+
+    if (!a || !b || a == b) return;
+
+    if (a->next == b) { t = a; a = b; b = t; }
+
+    if (b->next == a) {
+        t = a; a = b; b = t;
+    }
+
+    if (a->next == b) {
+        a->next = b->next;
+        b->prev = a->prev;
+        b->next = a;
+        a->prev = b;
+        if (b->prev) b->prev->next = b;
+        else head = b;
+        if (a->next) a->next->prev = a;
+        return;
+    }
+
+    if (a->prev) a->prev->next = b;
+    else head = b;
+    if (b->prev) b->prev->next = a;
+    else head = a;
+
+    if (a->next) a->next->prev = b;
+    if (b->next) b->next->prev = a;
+
+    t = a->prev; a->prev = b->prev; b->prev = t;
+    t = a->next; a->next = b->next; b->next = t;
+}
+
+void display() {
+    struct node *t = head;
+    while (t) {
+        printf("%d ", t->data);
+        t = t->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    int n, x, y, i, v;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &v);
+        insert(v);
+    }
+
+    printf("Enter elements to swap: ");
+    scanf("%d%d", &x, &y);
+
+    swap(x, y);
+    display();
+
+    return 0;
+}
+Output:
+Enter number of nodes: 4
+Enter elements: 10 20 30 40
+Enter elements to swap: 20 40
+10 40 30 20
+
+4)#include <stdio.h>
+
+int main() {
+    int a[100], n, i, x, pos, ch, temp;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    while (1) {
+        printf("\n1.Insert 2.Find 3.Display 4.Exit\n");
+        scanf("%d", &ch);
+
+        switch (ch) {
+            case 1:
+                printf("Enter element: ");
+                scanf("%d", &x);
+                for (i = n; i > 0; i--)
+                    a[i] = a[i - 1];
+                a[0] = x;
+                n++;
+                break;
+
+            case 2:
+                printf("Enter element to find: ");
+                scanf("%d", &x);
+                for (pos = 0; pos < n && a[pos] != x; pos++);
+                if (pos == n)
+                    printf("Not found\n");
+                else {
+                    temp = a[pos];
+                    for (i = pos; i > 0; i--)
+                        a[i] = a[i - 1];
+                    a[0] = temp;
+                    printf("Found\n");
+                }
+                break;
+
+            case 3:
+                for (i = 0; i < n; i++)
+                    printf("%d ", a[i]);
+                printf("\n");
+                break;
+
+            case 4:
+                return 0;
+        }
+    }
+}
+Output:
+Enter number of elements: 4
+Enter elements: 10 20 30 40
+
+1.Insert 2.Find 3.Display 4.Exit
+2
+Enter element to find: 30
+Found
+
+1.Insert 2.Find 3.Display 4.Exit
+3
+30 10 20 40
+
+1.Insert 2.Find 3.Display 4.Exit
+1
+Enter element: 50
+
+1.Insert 2.Find 3.Display 4.Exit
+3
+50 30 10 20 40
+
+5)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+void insert(int x) {
+    struct node *n = malloc(sizeof(struct node)), *t = head;
+    n->data = x;
+    n->next = NULL;
+    n->prev = NULL;
+
+    if (head == NULL)
+        head = n;
+    else {
+        while (t->next != NULL)
+            t = t->next;
+        t->next = n;
+        n->prev = t;
+    }
+}
+
+void reverse() {
+    struct node *t = NULL, *cur = head;
+
+    while (cur != NULL) {
+        t = cur->prev;
+        cur->prev = cur->next;
+        cur->next = t;
+        cur = cur->prev;
+    }
+
+    if (t != NULL)
+        head = t->prev;
+}
+
+void display() {
+    struct node *t = head;
+    while (t != NULL) {
+        printf("%d ", t->data);
+        t = t->next;
+    }
+}
+
+int main() {
+    int n, x, i;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        insert(x);
+    }
+
+    reverse();
+
+    printf("Reversed list: ");
+    display();
+
+    return 0;
+}
+Output:
+Enter number of nodes: 4
+Enter elements: 10 20 30 40
+Reversed list: 40 30 20 10
+
+6)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+void insert(int x) {
+    struct node *n = malloc(sizeof(struct node)), *t = head;
+    n->data = x;
+    n->prev = n->next = NULL;
+
+    if (head == NULL)
+        head = n;
+    else {
+        while (t->next != NULL)
+            t = t->next;
+        t->next = n;
+        n->prev = t;
+    }
+}
+
+void deleteMiddle() {
+    struct node *slow = head, *fast = head;
+
+    if (head == NULL) return;
+
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+
+    if (slow->prev != NULL)
+        slow->prev->next = slow->next;
+    else
+        head = slow->next;
+
+    if (slow->next != NULL)
+        slow->next->prev = slow->prev;
+
+    free(slow);
+}
+
+void display() {
+    struct node *t = head;
+    while (t != NULL) {
+        printf("%d ", t->data);
+        t = t->next;
+    }
+}
+
+int main() {
+    int n, x, i;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        insert(x);
+    }
+
+    deleteMiddle();
+
+    printf("List after deletion: ");
+    display();
+
+    return 0;
+}
+Output:
+Enter number of nodes: 5
+Enter elements: 10 20 30 40 50
+List after deletion: 10 20 40 50
+
+7)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+void insert(int x) {
+    struct node *n = malloc(sizeof(struct node)), *t = head;
+    n->data = x;
+    n->prev = n->next = NULL;
+
+    if (!head) head = n;
+    else {
+        while (t->next) t = t->next;
+        t->next = n;
+        n->prev = t;
+    }
+}
+
+void removeDup(int sorted) {
+    struct node *t = head, *p, *d;
+
+    while (t) {
+        p = t->next;
+        while (p) {
+            if (p->data == t->data) {
+                d = p;
+                p = p->next;
+                if (d->prev) d->prev->next = d->next;
+                if (d->next) d->next->prev = d->prev;
+                free(d);
+                if (sorted) break;
+            } else p = p->next;
+        }
+        t = t->next;
+    }
+}
+
+void display() {
+    struct node *t = head;
+    while (t) {
+        printf("%d ", t->data);
+        t = t->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    int n, x, i, ch;
+
+    printf("1.Sorted DLL  2.Unsorted DLL\n");
+    scanf("%d", &ch);
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        insert(x);
+    }
+
+    removeDup(ch == 1);
+
+    printf("List after removing duplicates: ");
+    display();
+
+    return 0;
+}
+Output:
+1.Sorted DLL  2.Unsorted DLL
+1
+Enter number of nodes: 6
+Enter elements: 10 10 20 30 30 40
+List after removing duplicates: 10 20 30 40
+
+1.Sorted DLL  2.Unsorted DLL
+2
+Enter number of nodes: 6
+Enter elements: 10 20 10 30 20 40
+List after removing duplicates: 10 20 30 40
+
+8)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+void insert(int x) {
+    struct node *n = malloc(sizeof(struct node));
+    n->data = x;
+
+    if (head == NULL) {
+        head = n;
+        n->next = n->prev = n;
+    } else {
+        struct node *t = head->prev;
+        n->next = head;
+        n->prev = t;
+        t->next = n;
+        head->prev = n;
+    }
+}
+
+int frequency(int x) {
+    struct node *t = head;
+    int count = 0;
+
+    if (head == NULL) return 0;
+
+    do {
+        if (t->data == x) count++;
+        t = t->next;
+    } while (t != head);
+
+    return count;
+}
+
+int main() {
+    int n, x, i, key;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        insert(x);
+    }
+
+    printf("Enter integer to find: ");
+    scanf("%d", &key);
+
+    printf("Frequency: %d\n", frequency(key));
+
+    return 0;
+}
+Output:
+Enter number of nodes: 5
+Enter elements: 10 20 10 30 10
+Enter integer to find: 10
+Frequency: 3
+
+9)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *left, *right;
+};
+
+struct node *create() {
+    int x;
+    struct node *n;
+
+    scanf("%d", &x);
+    if (x == -1) return NULL;
+
+    n = malloc(sizeof(struct node));
+    n->data = x;
+    n->left = create();
+    n->right = create();
+    return n;
+}
+
+int search(struct node *root, int key) {
+    if (root == NULL) return 0;
+    if (root->data == key) return 1;
+
+    return search(root->left, key) ||
+           search(root->right, key);
+}
+
+int main() {
+    struct node *root;
+    int key;
+
+    printf("Enter tree nodes (-1 for NULL): ");
+    root = create();
+
+    printf("Enter element to search: ");
+    scanf("%d", &key);
+
+    if (search(root, key))
+        printf("Element found");
+    else
+        printf("Element not found");
+
+    return 0;
+}
+Output:
+Enter tree nodes (-1 for NULL): 10 5 -1 -1 20 -1 -1
+Enter element to search: 20
+Element found
+
+10)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *left, *right;
+};
+
+struct node *create() {
+    int x;
+    struct node *n;
+
+    scanf("%d", &x);
+    if (x == -1) return NULL;
+
+    n = malloc(sizeof(struct node));
+    n->data = x;
+    n->left = create();
+    n->right = create();
+    return n;
+}
+
+int height(struct node *root) {
+    int l, r;
+    if (root == NULL) return 0;
+
+    l = height(root->left);
+    r = height(root->right);
+
+    return 1 + (l > r ? l : r);
+}
+
+int main() {
+    struct node *root;
+
+    printf("Enter tree nodes (-1 for NULL): ");
+    root = create();
+
+    printf("Height of tree: %d", height(root));
+
+    return 0;
+}
+Output:
+Enter tree nodes (-1 for NULL): 10 5 -1 -1 20 -1 -1
+Height of tree: 2
+
+11)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *left, *right;
+};
+
+struct node *create() {
+    int x;
+    struct node *n;
+
+    scanf("%d", &x);
+    if (x == -1) return NULL;
+
+    n = malloc(sizeof(struct node));
+    n->data = x;
+    n->left = create();
+    n->right = create();
+    return n;
+}
+
+void convert(struct node *root, struct node **head,
+             struct node **prev) {
+    if (root == NULL) return;
+
+    convert(root->left, head, prev);
+
+    root->left = *prev;
+    if (*prev == NULL)
+        *head = root;
+    else
+        (*prev)->right = root;
+
+    *prev = root;
+
+    convert(root->right, head, prev);
+}
+
+void display(struct node *head) {
+    while (head != NULL) {
+        printf("%d ", head->data);
+        head = head->right;
+    }
+}
+
+int main() {
+    struct node *root, *head = NULL, *prev = NULL;
+
+    printf("Enter tree nodes (-1 for NULL): ");
+    root = create();
+
+    convert(root, &head, &prev);
+    if (prev != NULL)
+        prev->right = NULL;
+
+    printf("Doubly linked list: ");
+    display(head);
+
+    return 0;
+}
+Output:
+Enter tree nodes (-1 for NULL): 4 2 1 -1 -1 3 -1 -1 6 5 -1 -1 7 -1 -1
+Doubly linked list: 1 2 3 4 5 6 7
+
+12)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *left, *right, *nextRight;
+};
+
+struct node *create() {
+    int x;
+    struct node *n;
+
+    scanf("%d", &x);
+    if (x == -1) return NULL;
+
+    n = malloc(sizeof(struct node));
+    n->data = x;
+    n->nextRight = NULL;
+    n->left = create();
+    n->right = create();
+    return n;
+}
+
+void connect(struct node *root) {
+    struct node *q[100], *t;
+    int front = 0, rear = 0, count, i;
+
+    if (!root) return;
+    q[rear++] = root;
+
+    while (front < rear) {
+        count = rear - front;
+
+        for (i = 0; i < count; i++) {
+            t = q[front++];
+            if (i < count - 1)
+                t->nextRight = q[front];
+            else
+                t->nextRight = NULL;
+
+            if (t->left) q[rear++] = t->left;
+            if (t->right) q[rear++] = t->right;
+        }
+    }
+}
+
+void display(struct node *root) {
+    struct node *t = root;
+
+    while (t) {
+        printf("Level: ");
+        while (t) {
+            printf("%d ", t->data);
+            if (t->nextRight == NULL) break;
+            t = t->nextRight;
+        }
+        printf("\n");
+        t = (t && t->left) ? t->left :
+            (t && t->right) ? t->right : NULL;
+    }
+}
+
+int main() {
+    struct node *root;
+
+    printf("Enter tree nodes (-1 for NULL): ");
+    root = create();
+
+    connect(root);
+
+    printf("Nodes connected by level:\n");
+    display(root);
+
+    return 0;
+}
+Output:
+Enter tree nodes (-1 for NULL): 1 2 4 -1 -1 5 -1 -1 3 6 -1 -1 7 -1 -1
+Nodes connected by level:
+Level: 1
+Level: 2 3
+Level: 4 5 6 7
+
+13)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *left, *right;
+};
+
+struct node *insert(struct node *root, int x) {
+    if (root == NULL) {
+        root = malloc(sizeof(struct node));
+        root->data = x;
+        root->left = root->right = NULL;
+    } else if (x < root->data)
+        root->left = insert(root->left, x);
+    else
+        root->right = insert(root->right, x);
+
+    return root;
+}
+
+void display(struct node *root) {
+    if (root != NULL) {
+        display(root->left);
+        printf("%d ", root->data);
+        display(root->right);
+    }
+}
+
+int main() {
+    struct node *root = NULL;
+    int n, x, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        root = insert(root, x);
+    }
+
+    printf("Priority queue: ");
+    display(root);
+
+    return 0;
+}
+Output:
+Enter number of elements: 5
+Enter elements: 40 20 60 10 30
+Priority queue: 10 20 30 40 60
+
+14)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *left, *right;
+};
+
+struct node *insert(struct node *tree, int val) {
+    if (tree == NULL) {
+        tree = malloc(sizeof(struct node));
+        tree->data = val;
+        tree->left = tree->right = NULL;
+    } else if (val < tree->data)
+        tree->left = insert(tree->left, val);
+    else
+        tree->right = insert(tree->right, val);
+
+    return tree;
+}
+
+struct node *findlarge(struct node *tree) {
+    while (tree->right != NULL)
+        tree = tree->right;
+    return tree;
+}
+
+struct node *delete(struct node *tree, int val) {
+    struct node *ptr, *temp;
+
+    if (tree == NULL)
+        return NULL;
+
+    if (val < tree->data)
+        tree->left = delete(tree->left, val);
+    else if (val > tree->data)
+        tree->right = delete(tree->right, val);
+    else {
+        if (tree->left != NULL && tree->right != NULL) {
+            ptr = findlarge(tree->left);
+            tree->data = ptr->data;
+            tree->left = delete(tree->left, ptr->data);
+        } else {
+            temp = tree;
+            if (tree->left == NULL)
+                tree = tree->right;
+            else
+                tree = tree->left;
+            free(temp);
+        }
+    }
+    return tree;
+}
+
+void inorder(struct node *tree) {
+    if (tree != NULL) {
+        inorder(tree->left);
+        printf("%d ", tree->data);
+        inorder(tree->right);
+    }
+}
+
+int main() {
+    struct node *tree = NULL;
+    int n, x, i, val;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        tree = insert(tree, x);
+    }
+
+    printf("Enter element to delete: ");
+    scanf("%d", &val);
+
+    tree = delete(tree, val);
+
+    printf("BST after deletion: ");
+    inorder(tree);
+
+    return 0;
+}
+Output:
+Enter number of nodes: 7
+Enter elements: 50 30 70 20 40 60 80
+Enter element to delete: 50
+BST after deletion: 20 30 40 60 70 80
+
+15)
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+struct node {
+    char data;
+    struct node *left, *right;
+};
+
+struct node *stack[100];
+int top = -1;
+
+struct node *create(char x) {
+    struct node *n = malloc(sizeof(struct node));
+    n->data = x;
+    n->left = n->right = NULL;
+    return n;
+}
+
+void postfixTree(char exp[]) {
+    int i;
+    struct node *n;
+
+    for (i = 0; exp[i] != '\0'; i++) {
+        n = create(exp[i]);
+
+        if (isalnum(exp[i]))
+            stack[++top] = n;
+        else {
+            n->right = stack[top--];
+            n->left = stack[top--];
+            stack[++top] = n;
+        }
+    }
+}
+
+void inorder(struct node *root) {
+    if (root != NULL) {
+        if (root->left) printf("(");
+        inorder(root->left);
+        printf("%c", root->data);
+        inorder(root->right);
+        if (root->right) printf(")");
+    }
+}
+
+int main() {
+    char exp[100];
+
+    printf("Enter postfix expression: ");
+    scanf("%99s", exp);
+
+    postfixTree(exp);
+
+    printf("Infix expression: ");
+    inorder(stack[top]);
+
+    return 0;
+}
+Output:
+Enter postfix expression: ab+c*
+Infix expression: (a+b)*c
+
+
+16)#include <stdio.h>
+#include <stdlib.h>
+
+struct node
+{
+    int data;
+    struct node *left, *right;
+};
+
+struct node *insert(struct node *root, int x)
+{
+    if (root == NULL)
+    {
+        root = (struct node *)malloc(sizeof(struct node));
+        root->data = x;
+        root->left = root->right = NULL;
+    }
+    else if (x < root->data)
+        root->left = insert(root->left, x);
+    else if (x > root->data)
+        root->right = insert(root->right, x);
+
+    return root;
+}
+
+void inorder(struct node *root)
+{
+    if (root != NULL)
+    {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+void preorder(struct node *root)
+{
+    if (root != NULL)
+    {
+        printf("%d ", root->data);
+        preorder(root->left);
+        preorder(root->right);
+    }
+}
+
+void postorder(struct node *root)
+{
+    if (root != NULL)
+    {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%d ", root->data);
+    }
+}
+
+int main()
+{
+    struct node *root = NULL;
+    int n, x, i;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter elements: ");
+    for (i = 0; i < n; i++)
+    {
+        scanf("%d", &x);
+        root = insert(root, x);
+    }
+
+    printf("Inorder: ");
+    inorder(root);
+
+    printf("\nPreorder: ");
+    preorder(root);
+
+    printf("\nPostorder: ");
+    postorder(root);
+
+    return 0;
+}
+
+Output:
+Enter number of nodes: 5
+Enter elements: 40 20 60 10 30
+Inorder: 10 20 30 40 60
+Preorder: 40 20 10 30 60
+Postorder: 10 30 20 60 40
+
+17)#include <stdio.h>
+
+void heapify(int a[], int n, int i)
+{
+    int largest = i, l = 2 * i + 1, r = 2 * i + 2, temp;
+
+    if (l < n && a[l] > a[largest])
+        largest = l;
+
+    if (r < n && a[r] > a[largest])
+        largest = r;
+
+    if (largest != i)
+    {
+        temp = a[i];
+        a[i] = a[largest];
+        a[largest] = temp;
+        heapify(a, n, largest);
+    }
+}
+
+void heapSort(int a[], int n)
+{
+    int i, temp;
+
+    for (i = n / 2 - 1; i >= 0; i--)
+        heapify(a, n, i);
+
+    for (i = n - 1; i > 0; i--)
+    {
+        temp = a[0];
+        a[0] = a[i];
+        a[i] = temp;
+        heapify(a, i, 0);
+    }
+}
+
+int main()
+{
+    int a[] = {50, 20, 30, 15, 22, 32};
+    int n = 6, i;
+
+    heapSort(a, n);
+
+    printf("Sorted array: ");
+    for (i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    return 0;
+}
+
+Output:
+Sorted array: 15 20 22 30 32 50

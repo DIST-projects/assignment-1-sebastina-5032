@@ -1,0 +1,966 @@
+1)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int coeff, exp;
+    struct node *next;
+};
+
+struct node *create(int c, int e) {
+    struct node *t;
+    t = (struct node *)malloc(sizeof(struct node));
+    t->coeff = c;
+    t->exp = e;
+    t->next = NULL;
+    return t;
+}
+
+struct node *insert(struct node *head, int c, int e) {
+    struct node *t, *p;
+    t = create(c, e);
+
+    if (head == NULL)
+        return t;
+
+    p = head;
+    while (p->next != NULL)
+        p = p->next;
+
+    p->next = t;
+    return head;
+}
+
+struct node *readPoly() {
+    struct node *head = NULL;
+    int n, i, c, e;
+
+    printf("Enter number of terms: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        printf("Enter coefficient and exponent: ");
+        scanf("%d%d", &c, &e);
+        head = insert(head, c, e);
+    }
+
+    return head;
+}
+
+void display(struct node *p) {
+    while (p != NULL) {
+        printf("%dx^%d", p->coeff, p->exp);
+        if (p->next != NULL)
+            printf(" + ");
+        p = p->next;
+    }
+    printf("\n");
+}
+
+struct node *calculate(struct node *a,
+                       struct node *b, int sign) {
+    struct node *result = NULL;
+
+    while (a != NULL && b != NULL) {
+        if (a->exp == b->exp) {
+            if (a->coeff + sign * b->coeff != 0)
+                result = insert(result,
+                    a->coeff + sign * b->coeff, a->exp);
+            a = a->next;
+            b = b->next;
+        } else if (a->exp > b->exp) {
+            result = insert(result, a->coeff, a->exp);
+            a = a->next;
+        } else {
+            result = insert(result, sign * b->coeff, b->exp);
+            b = b->next;
+        }
+    }
+
+    while (a != NULL) {
+        result = insert(result, a->coeff, a->exp);
+        a = a->next;
+    }
+
+    while (b != NULL) {
+        result = insert(result, sign * b->coeff, b->exp);
+        b = b->next;
+    }
+
+    return result;
+}
+
+int main() {
+    struct node *p1, *p2, *sum, *diff;
+
+    printf("First polynomial\n");
+    p1 = readPoly();
+
+    printf("Second polynomial\n");
+    p2 = readPoly();
+
+    printf("First polynomial: ");
+    display(p1);
+
+    printf("Second polynomial: ");
+    display(p2);
+
+    sum = calculate(p1, p2, 1);
+    diff = calculate(p1, p2, -1);
+
+    printf("Addition: ");
+    display(sum);
+
+    printf("Subtraction: ");
+    display(diff);
+
+    return 0;
+}
+
+Output:
+First polynomial
+Enter number of terms: 3
+Enter coefficient and exponent: 3 2
+Enter coefficient and exponent: 2 1
+Enter coefficient and exponent: 1 0
+Second polynomial
+Enter number of terms: 3
+Enter coefficient and exponent: 4 2
+Enter coefficient and exponent: 5 1
+Enter coefficient and exponent: 2 0
+First polynomial: 3x^2 + 2x^1 + 1x^0
+Second polynomial: 4x^2 + 5x^1 + 2x^0
+Addition: 7x^2 + 7x^1 + 3x^0
+Subtraction: -1x^2 + -3x^1 + -1x^0
+
+2)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+int main() {
+    struct node *head = NULL, *tail = NULL;
+    struct node *p, *prev;
+    int n, i, value, key;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        p = (struct node *)malloc(sizeof(struct node));
+
+        printf("Enter data: ");
+        scanf("%d", &p->data);
+
+        if (head == NULL) {
+            head = tail = p;
+        } else {
+            tail->next = p;
+            tail = p;
+        }
+    }
+
+    if (head == NULL) {
+        printf("List is empty\n");
+        return 0;
+    }
+
+    tail->next = head;
+
+    printf("Enter element to find previous node: ");
+    scanf("%d", &key);
+
+    p = head;
+    prev = tail;
+
+    do {
+        if (p->data == key) {
+            printf("Previous node = %d\n", prev->data);
+            return 0;
+        }
+
+        prev = p;
+        p = p->next;
+    } while (p != head);
+
+    printf("Element not found\n");
+    return 0;
+}
+
+Output:
+Enter number of nodes: 4
+Enter data: 10
+Enter data: 20
+Enter data: 30
+Enter data: 40
+Enter element to find previous node: 30
+Previous node = 20
+
+3)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+int main() {
+    struct node *head = NULL, *tail = NULL;
+    struct node *p, *t;
+    int n, i, pos, value;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        t = (struct node *)malloc(sizeof(struct node));
+
+        printf("Enter data: ");
+        scanf("%d", &t->data);
+
+        if (head == NULL) {
+            head = tail = t;
+        } else {
+            tail->next = t;
+            tail = t;
+        }
+    }
+
+    if (head != NULL)
+        tail->next = head;
+
+    printf("Enter position: ");
+    scanf("%d", &pos);
+
+    printf("Enter value: ");
+    scanf("%d", &value);
+
+    if (pos < 1 || pos > n + 1) {
+        printf("Invalid position\n");
+        return 0;
+    }
+
+    t = (struct node *)malloc(sizeof(struct node));
+    t->data = value;
+
+    if (pos == 1) {
+        if (head == NULL) {
+            head = tail = t;
+            t->next = head;
+        } else {
+            t->next = head;
+            head = t;
+            tail->next = head;
+        }
+    } else {
+        p = head;
+
+        for (i = 1; i < pos - 1; i++)
+            p = p->next;
+
+        t->next = p->next;
+        p->next = t;
+
+        if (p == tail)
+            tail = t;
+
+        tail->next = head;
+    }
+
+    printf("Circular linked list: ");
+    p = head;
+
+    if (p != NULL) {
+        do {
+            printf("%d ", p->data);
+            p = p->next;
+        } while (p != head);
+    }
+
+    printf("\n");
+    return 0;
+}
+
+Ouput:
+Enter number of nodes: 3
+Enter data: 10
+Enter data: 20
+Enter data: 30
+Enter position: 2
+Enter value: 15
+Circular linked list: 10 15 20 30
+
+4)#include <stdio.h>
+
+int main() {
+    int q[100], n, i;
+    int largest, second, found = 0;
+
+    printf("Enter queue size: ");
+    scanf("%d", &n);
+
+    if (n < 2 || n > 100) {
+        printf("Invalid queue size\n");
+        return 0;
+    }
+
+    printf("Enter queue elements: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &q[i]);
+
+    largest = q[0];
+
+    for (i = 1; i < n; i++) {
+        if (q[i] > largest)
+            largest = q[i];
+    }
+
+    for (i = 0; i < n; i++) {
+        if (q[i] < largest) {
+            if (found == 0 || q[i] > second) {
+                second = q[i];
+                found = 1;
+            }
+        }
+    }
+
+    if (found)
+        printf("Second largest element = %d\n", second);
+    else
+        printf("Second largest element does not exist\n");
+
+    return 0;
+}
+Output:
+Enter queue size: 5
+Enter queue elements: 10 40 20 50 30
+Second largest element = 40
+
+5)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+int main() {
+    struct node *head = NULL, *tail = NULL;
+    struct node *p, *t;
+    int n, i, value;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    if (n < 2) {
+        printf("At least 2 nodes are required\n");
+        return 0;
+    }
+
+    for (i = 0; i < n; i++) {
+        t = (struct node *)malloc(sizeof(struct node));
+
+        printf("Enter data: ");
+        scanf("%d", &t->data);
+        t->next = NULL;
+
+        if (head == NULL)
+            head = tail = t;
+        else {
+            tail->next = t;
+            tail = t;
+        }
+    }
+
+    printf("Enter value to insert at 3rd position: ");
+    scanf("%d", &value);
+
+    t = (struct node *)malloc(sizeof(struct node));
+    t->data = value;
+
+    p = head;
+    for (i = 1; i < 2; i++)
+        p = p->next;
+
+    t->next = p->next;
+    p->next = t;
+
+    printf("Linked list: ");
+    p = head;
+
+    while (p != NULL) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+
+    if (head->data == head->next->next->data)
+        printf("\nFirst and third elements are same\n");
+    else
+        printf("\nFirst and third elements are different\n");
+
+    return 0;
+}
+Output:
+Enter number of nodes: 3
+Enter data: 10
+Enter data: 20
+Enter data: 10
+Enter value to insert at 3rd position: 10
+Linked list: 10 20 10 10
+First and third elements are same
+
+6)#include <stdio.h>
+#define MAX 10
+
+int a[MAX];
+int top1 = -1, top2 = MAX;
+
+void push1(int x) {
+    if (top1 + 1 == top2)
+        printf("Stack Overflow\n");
+    else
+        a[++top1] = x;
+}
+
+void push2(int x) {
+    if (top1 + 1 == top2)
+        printf("Stack Overflow\n");
+    else
+        a[--top2] = x;
+}
+
+void display() {
+    int i;
+
+    printf("Array: ");
+
+    for (i = 0; i < MAX; i++) {
+        if (i <= top1 || i >= top2)
+            printf("%d ", a[i]);
+        else
+            printf("- ");
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int n1, n2, i, x;
+
+    printf("Enter number of elements in Stack 1: ");
+    scanf("%d", &n1);
+
+    printf("Enter number of elements in Stack 2: ");
+    scanf("%d", &n2);
+
+    if (n1 < 0 || n2 < 0 || n1 + n2 > MAX) {
+        printf("Invalid stack sizes\n");
+        return 0;
+    }
+
+    printf("Enter Stack 1 elements: ");
+    for (i = 0; i < n1; i++) {
+        scanf("%d", &x);
+        push1(x);
+    }
+
+    printf("Enter Stack 2 elements: ");
+    for (i = 0; i < n2; i++) {
+        scanf("%d", &x);
+        push2(x);
+    }
+
+    printf("Stack 1: ");
+    for (i = 0; i <= top1; i++)
+        printf("%d ", a[i]);
+
+    printf("\nStack 2: ");
+    for (i = MAX - 1; i >= top2; i--)
+        printf("%d ", a[i]);
+
+    printf("\n");
+    display();
+
+    return 0;
+}
+
+Output:
+Enter number of elements in Stack 1: 3
+Enter number of elements in Stack 2: 3
+Enter Stack 1 elements: 10 20 30
+Enter Stack 2 elements: 100 200 300
+Stack 1: 10 20 30
+Stack 2: 300 200 100
+Array: 10 20 30 - - - - 300 200 100
+
+7)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next, *bottom;
+};
+
+struct node *create(int x) {
+    struct node *t = malloc(sizeof(struct node));
+    t->data = x;
+    t->next = NULL;
+    t->bottom = NULL;
+    return t;
+}
+
+struct node *merge(struct node *a, struct node *b) {
+    struct node dummy;
+    struct node *tail = &dummy;
+
+    dummy.bottom = NULL;
+
+    while (a != NULL && b != NULL) {
+        if (a->data <= b->data) {
+            tail->bottom = a;
+            a = a->bottom;
+        } else {
+            tail->bottom = b;
+            b = b->bottom;
+        }
+        tail = tail->bottom;
+        tail->next = NULL;
+    }
+
+    if (a != NULL)
+        tail->bottom = a;
+    else
+        tail->bottom = b;
+
+    return dummy.bottom;
+}
+
+int main() {
+    struct node *head = NULL, *tail = NULL;
+    struct node *p, *t, *nextHead, *result = NULL;
+    int n, m, i, j, x;
+
+    printf("Enter number of head nodes: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        printf("Enter number of nodes in sublist %d: ", i + 1);
+        scanf("%d", &m);
+
+        p = NULL;
+        tail = NULL;
+
+        for (j = 0; j < m; j++) {
+            printf("Enter data: ");
+            scanf("%d", &x);
+
+            t = create(x);
+
+            if (p == NULL)
+                p = tail = t;
+            else {
+                tail->bottom = t;
+                tail = t;
+            }
+        }
+
+        if (head == NULL)
+            head = tail = p;
+        else {
+            tail = head;
+            while (tail->next != NULL)
+                tail = tail->next;
+            tail->next = p;
+        }
+    }
+
+    p = head;
+
+    while (p != NULL) {
+        nextHead = p->next;
+        p->next = NULL;
+        result = merge(result, p);
+        p = nextHead;
+    }
+
+    printf("Flattened list: ");
+
+    p = result;
+    while (p != NULL) {
+        printf("%d", p->data);
+        if (p->bottom != NULL)
+            printf(" -> ");
+        p = p->bottom;
+    }
+
+    printf("\n");
+    return 0;
+}
+Output:
+Enter number of head nodes: 4
+Enter number of nodes in sublist 1: 3
+Enter data: 5
+Enter data: 7
+Enter data: 8
+Enter number of nodes in sublist 2: 2
+Enter data: 10
+Enter data: 20
+Enter number of nodes in sublist 3: 2
+Enter data: 19
+Enter data: 22
+Enter number of nodes in sublist 4: 3
+Enter data: 28
+Enter data: 40
+Enter data: 45
+Flattened list: 5 -> 7 -> 8 -> 10 -> 19 -> 20 -> 22 -> 28 -> 40 -> 45
+
+8)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *create(int x) {
+    struct node *t = malloc(sizeof(struct node));
+    t->data = x;
+    t->next = NULL;
+    return t;
+}
+
+struct node *merge(struct node *a, struct node *b) {
+    struct node dummy;
+    struct node *tail = &dummy;
+
+    dummy.next = NULL;
+
+    while (a != NULL && b != NULL) {
+        if (a->data <= b->data) {
+            tail->next = a;
+            a = a->next;
+        } else {
+            tail->next = b;
+            b = b->next;
+        }
+        tail = tail->next;
+    }
+
+    if (a != NULL)
+        tail->next = a;
+    else
+        tail->next = b;
+
+    return dummy.next;
+}
+
+int main() {
+    struct node *head[20];
+    struct node *p, *tail;
+    int k, n, i, j, x;
+
+    printf("Enter number of linked lists: ");
+    scanf("%d", &k);
+
+    if (k < 1 || k > 20) {
+        printf("Invalid number of lists\n");
+        return 0;
+    }
+
+    for (i = 0; i < k; i++) {
+        head[i] = NULL;
+        tail = NULL;
+
+        printf("Enter number of nodes in list %d: ", i + 1);
+        scanf("%d", &n);
+
+        for (j = 0; j < n; j++) {
+            printf("Enter data: ");
+            scanf("%d", &x);
+
+            p = create(x);
+
+            if (head[i] == NULL)
+                head[i] = tail = p;
+            else {
+                tail->next = p;
+                tail = p;
+            }
+        }
+    }
+
+    p = head[0];
+
+    for (i = 1; i < k; i++)
+        p = merge(p, head[i]);
+
+    printf("Merged list: ");
+
+    while (p != NULL) {
+        printf("%d", p->data);
+        if (p->next != NULL)
+            printf(" -> ");
+        p = p->next;
+    }
+
+    printf("\n");
+    return 0;
+}
+
+Output:
+Enter number of linked lists: 3
+Enter number of nodes in list 1: 3
+Enter data: 1
+Enter data: 4
+Enter data: 7
+Enter number of nodes in list 2: 3
+Enter data: 2
+Enter data: 5
+Enter data: 8
+Enter number of nodes in list 3: 3
+Enter data: 3
+Enter data: 6
+Enter data: 9
+Merged list: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+
+9)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *create(int x) {
+    struct node *t = malloc(sizeof(struct node));
+    t->data = x;
+    t->next = NULL;
+    return t;
+}
+
+int main() {
+    struct node *head = NULL, *tail = NULL;
+    struct node *p, *x, *y, *prev1, *prev2, *temp;
+    int n, k, i, value, pos1, pos2;
+
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        printf("Enter data: ");
+        scanf("%d", &value);
+
+        p = create(value);
+
+        if (head == NULL)
+            head = tail = p;
+        else {
+            tail->next = p;
+            tail = p;
+        }
+    }
+
+    printf("Enter k: ");
+    scanf("%d", &k);
+
+    if (k < 1 || k > n) {
+        printf("Invalid k\n");
+        return 0;
+    }
+
+    pos1 = k;
+    pos2 = n - k + 1;
+
+    if (pos1 == pos2) {
+        printf("List after swapping: ");
+        p = head;
+        while (p != NULL) {
+            printf("%d ", p->data);
+            p = p->next;
+        }
+        printf("\n");
+        return 0;
+    }
+
+    if (pos1 > pos2) {
+        i = pos1;
+        pos1 = pos2;
+        pos2 = i;
+    }
+
+    prev1 = NULL;
+    x = head;
+
+    for (i = 1; i < pos1; i++) {
+        prev1 = x;
+        x = x->next;
+    }
+
+    prev2 = NULL;
+    y = head;
+
+    for (i = 1; i < pos2; i++) {
+        prev2 = y;
+        y = y->next;
+    }
+
+    if (prev1 != NULL)
+        prev1->next = y;
+    else
+        head = y;
+
+    if (prev2 != NULL)
+        prev2->next = x;
+
+    if (x->next == y) {
+        x->next = y->next;
+        y->next = x;
+    } else {
+        temp = x->next;
+        x->next = y->next;
+        y->next = temp;
+    }
+
+    printf("List after swapping: ");
+    p = head;
+
+    while (p != NULL) {
+        printf("%d ", p->data);
+        p = p->next;
+    }
+
+    printf("\n");
+    return 0;
+}
+Output:
+Enter number of nodes: 5
+Enter data: 10
+Enter data: 20
+Enter data: 30
+Enter data: 40
+Enter data: 50
+Enter k: 2
+List after swapping: 10 40 30 20 50
+
+10)#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *create(int x) {
+    struct node *t = malloc(sizeof(struct node));
+    t->data = x;
+    t->next = NULL;
+    return t;
+}
+
+struct node *insert(struct node *head, int x) {
+    struct node *t = create(x);
+    struct node *p;
+
+    if (head == NULL)
+        return t;
+
+    p = head;
+    while (p->next != NULL)
+        p = p->next;
+
+    p->next = t;
+    return head;
+}
+
+struct node *readList(int a[], int *n) {
+    struct node *head = NULL;
+    int i, x;
+
+    printf("Enter number of digits: ");
+    scanf("%d", n);
+
+    if (*n < 1 || *n > 100) {
+        printf("Invalid number of digits\n");
+        exit(0);
+    }
+
+    for (i = 0; i < *n; i++) {
+        printf("Enter digit: ");
+        scanf("%d", &x);
+
+        if (x < 0 || x > 9) {
+            printf("Invalid digit\n");
+            exit(0);
+        }
+
+        a[i] = x;
+        head = insert(head, x);
+    }
+
+    return head;
+}
+
+void display(struct node *p) {
+    while (p != NULL) {
+        printf("%d", p->data);
+        if (p->next != NULL)
+            printf(" -> ");
+        p = p->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    struct node *a, *b, *result = NULL;
+    int x[100], y[100], r[201] = {0};
+    int n, m, i, j, start;
+
+    printf("First number\n");
+    a = readList(x, &n);
+
+    printf("Second number\n");
+    b = readList(y, &m);
+
+    for (i = n - 1; i >= 0; i--) {
+        for (j = m - 1; j >= 0; j--) {
+            int sum = r[i + j + 1] + x[i] * y[j];
+
+            r[i + j + 1] = sum % 10;
+            r[i + j] += sum / 10;
+        }
+    }
+
+    printf("First number: ");
+    display(a);
+
+    printf("Second number: ");
+    display(b);
+
+    start = 0;
+
+    while (start < n + m - 1 && r[start] == 0)
+        start++;
+
+    for (i = start; i < n + m; i++)
+        result = insert(result, r[i]);
+
+    printf("Product: ");
+    display(result);
+
+    return 0;
+}
+Output:
+First number
+Enter number of digits: 3
+Enter digit: 1
+Enter digit: 0
+Enter digit: 0
+Second number
+Enter number of digits: 2
+Enter digit: 1
+Enter digit: 0
+First number: 1 -> 0 -> 0
+Second number: 1 -> 0
+Product: 1 -> 0 -> 0 -> 0
